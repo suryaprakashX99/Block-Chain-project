@@ -1,7 +1,7 @@
 {
   "name": "Apex Authentic Gear #101",
   "description": "Certificate of authenticity issued by Apex Auto & Trail Mechanics at point of sale. Transfers with the item on resale.",
-  "image": "https://suryaprakashx99.github.io/CA1-Block-chain/apex-gear-helmet.png",
+  "image": "https://suryaprakashx99.github.io/Block-Chain-project/apex-gear-helmet.png",
   "attributes": [
     { "trait_type": "Product", "value": "SMK Typhoon RD1 Helmet" },
     { "trait_type": "Size", "value": "L" },
