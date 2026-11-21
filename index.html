@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ethereum Integration Demo - Two Client Businesses</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231e293b%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22white%22%3E%CE%9E%3C/text%3E%3C/svg%3E">
+</head>
+<body class="home">
+  <header class="site">
+    <a class="logo" href="index.html">
+      <div class="logo-mark">Ξ</div>
+      <div class="logo-text"><b>Blockchain Integration Demo</b><small>MSc Fintech · Blockchain Technologies CA1</small></div>
+    </a>
+    <nav class="links">
+      <a href="turf.html">Elite Strikers Turf Club</a>
+      <a href="apex.html">Apex Auto &amp; Trail Mechanics</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Smart contracts for two local businesses</h1>
+    <p>Each client uses an ERC-20 token for payments and an ERC-721 NFT for a unique record.
+       All four contracts run on the Ethereum Sepolia test network and are used here through MetaMask.</p>
+    <div class="chips"><span class="chip accent">Sepolia testnet</span><span class="chip">ERC-20</span><span class="chip">ERC-721</span><span class="chip">MetaMask + ethers.js</span></div>
+  </section>
+
+  <main>
+    <div class="grid">
+      <div class="card client-card">
+        <div class="banner" style="background:#14532d">⚽ STRK · EPASS</div>
+        <h2>Elite Strikers Turf Club</h2>
+        <p class="sub">Dublin sports club running pitch bookings and the Elite Premier League.</p>
+        <ul>
+          <li><b>StrikeCoin (ERC-20):</b> prepaid credits for pitch bookings and match fees; prize money paid out in STRK.</li>
+          <li><b>Elite Pass (ERC-721):</b> one non-transferable NFT per seasonal member, carrying their booking discount.</li>
+        </ul>
+        <div class="actions"><a class="btn" href="turf.html" style="background:#14532d">Open club portal</a></div>
+      </div>
+
+      <div class="card client-card">
+        <div class="banner" style="background:#1f2328">🏍 APXP · APEXG</div>
+        <h2>Apex Auto &amp; Trail Mechanics</h2>
+        <p class="sub">Garage specialising in touring motorcycle prep and premium riding gear.</p>
+        <ul>
+          <li><b>Apex Loyalty Points (ERC-20):</b> points earned on every service, redeemed for discounts.</li>
+          <li><b>Apex Authentic Gear (ERC-721):</b> an authenticity certificate for each helmet or jacket, transferable on resale.</li>
+        </ul>
+        <div class="actions"><a class="btn" href="apex.html" style="background:#1f2328">Open garage portal</a></div>
+      </div>
+    </div>
+  </main>
+
+  <footer>Test network only. No real money is used. Tokens have no monetary value.</footer>
+</body>
+</html>

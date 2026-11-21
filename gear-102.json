@@ -1,0 +1,11 @@
+{
+  "name": "Apex Authentic Gear #102",
+  "description": "Certificate of authenticity issued by Apex Auto & Trail Mechanics at point of sale. Transfers with the item on resale.",
+  "image": "https://suryaprakashx99.github.io/CA1-Block-chain/apex-gear-jacket.png",
+  "attributes": [
+    { "trait_type": "Product", "value": "Royal Enfield Nirvik v2 Riding Jacket" },
+    { "trait_type": "Size", "value": "M" },
+    { "trait_type": "Serial", "value": "RE-NV2-40517" },
+    { "trait_type": "Sold by", "value": "Apex Auto & Trail Mechanics" }
+  ]
+}

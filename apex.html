@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apex Auto &amp; Trail Mechanics - Customer Portal</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231e293b%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22white%22%3E%CE%9E%3C/text%3E%3C/svg%3E">
+</head>
+<body class="apex">
+  <header class="site">
+    <a class="logo" href="apex.html">
+      <div class="logo-mark">A</div>
+      <div class="logo-text"><b>Apex Auto &amp; Trail Mechanics</b><small>Loyalty &amp; gear authenticity</small></div>
+    </a>
+    <nav class="links">
+      <a href="index.html">Home</a>
+      <a href="turf.html">Turf Club</a>
+      <button id="connectBtn">Connect MetaMask</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Earn points on every service. Prove your gear is genuine.</h1>
+    <p>Apex Loyalty Points reward each completed job. Every premium helmet and jacket comes with an authenticity certificate that anyone can check, and that passes to the next owner when you sell.</p>
+    <div class="chips"><span class="chip accent" id="roleChip">Not connected</span><span class="chip">APXP · ERC-20</span><span class="chip">APEXG · ERC-721</span></div>
+  </section>
+
+  <main>
+    <div class="notice" id="configNotice" hidden></div>
+
+    <div class="grid">
+      <!-- Wallet -->
+      <div class="card">
+        <span class="tag">My wallet</span>
+        <h2>Points &amp; certificates</h2>
+        <p class="sub">Read directly from the two contracts.</p>
+        <div class="stat"><span>Loyalty points</span><b id="ptsBalance">-</b></div>
+        <div class="stat"><span>Worth in discounts</span><b id="ptsValue">-</b></div>
+        <div class="stat"><span>Gear certificates held</span><b id="gearCount">-</b></div>
+      </div>
+
+      <!-- Verify -->
+      <div class="card">
+        <span class="tag erc721">ERC-721 · verifyGear</span>
+        <h2>Verify a helmet or jacket</h2>
+        <p class="sub">Check by certificate number, or by the serial printed on the item.</p>
+        <div class="row">
+          <div><label for="verifyId">Certificate number</label><input id="verifyId" type="number" min="1" placeholder="101"></div>
+          <div><label for="verifySerial">or serial number</label><input id="verifySerial" placeholder="SMK-TY-88231"></div>
+        </div>
+        <div class="actions"><button id="verifyBtn">Verify</button></div>
+        <div id="verifyResult"></div>
+      </div>
+
+      <!-- Redeem -->
+      <div class="card">
+        <span class="tag erc20">ERC-20 · redeemPoints</span>
+        <h2>Redeem points</h2>
+        <p class="sub">Spend points against an invoice at the counter.</p>
+        <div class="row">
+          <div><label for="redeemPts">Points</label><input id="redeemPts" type="number" min="1" step="1" placeholder="100"></div>
+          <div><label for="redeemInv">Invoice number</label><input id="redeemInv" placeholder="INV-1088"></div>
+        </div>
+        <div class="actions">
+          <button id="redeemBtn">Redeem</button>
+          <span class="price">Discount: <b id="redeemValue">€0.00</b></span>
+        </div>
+      </div>
+
+      <!-- Resale transfer -->
+      <div class="card">
+        <span class="tag erc721">ERC-721 · transferFrom</span>
+        <h2>Selling your gear?</h2>
+        <p class="sub">Pass the certificate to the buyer's wallet so they can prove it's genuine.</p>
+        <label for="xferId">Certificate number</label><input id="xferId" type="number" min="1">
+        <label for="xferTo">Buyer wallet</label><input id="xferTo" placeholder="0x...">
+        <div class="actions"><button id="xferBtn">Transfer certificate</button></div>
+      </div>
+
+      <!-- Activity -->
+      <div class="card">
+        <span class="tag">Public ledger</span>
+        <h2>Recent garage activity</h2>
+        <p class="sub">Points rewarded, points redeemed and gear certified.</p>
+        <ul class="feed" id="feed"><li class="empty">Connect your wallet to load activity.</li></ul>
+      </div>
+    </div>
+
+    <!-- Staff only -->
+    <section class="staff-zone" id="staffZone" hidden>
+      <h3><span class="tag staff">Garage staff only</span> Counter tools</h3>
+      <div class="grid">
+        <div class="card">
+          <span class="tag erc20">ERC-20 · rewardService</span>
+          <h2>Reward a completed service</h2>
+          <p class="sub">Points are calculated from the invoice total.</p>
+          <label for="rewTo">Customer wallet</label><input id="rewTo" placeholder="0x...">
+          <div class="row">
+            <div><label for="rewEuro">Invoice total (€)</label><input id="rewEuro" type="number" min="1" placeholder="180"></div>
+            <div><label for="rewInv">Invoice number</label><input id="rewInv" placeholder="INV-1043"></div>
+          </div>
+          <div class="actions">
+            <button id="rewBtn">Reward points</button>
+            <span class="price">Points: <b id="rewPts">0</b></span>
+          </div>
+        </div>
+
+        <div class="card">
+          <span class="tag erc721">ERC-721 · mint</span>
+          <h2>Certify gear at point of sale</h2>
+          <p class="sub">Each manufacturer serial can only be certified once.</p>
+          <label for="gearTo">Buyer wallet</label><input id="gearTo" placeholder="0x...">
+          <div class="row">
+            <div><label for="gearId">Certificate number</label><input id="gearId" type="number" min="1" placeholder="101"></div>
+            <div><label for="gearProduct">Product</label>
+              <select id="gearProduct">
+                <option>Royal Enfield Nirvik v2 Riding Jacket</option>
+                <option>SMK Typhoon RD1 Helmet</option>
+                <option>Royal Enfield Touring Gloves</option>
+                <option>Royal Enfield Riding Boots</option>
+              </select>
+            </div>
+          </div>
+          <div class="row">
+            <div><label for="gearSize">Size</label><input id="gearSize" placeholder="L"></div>
+            <div><label for="gearSerial">Manufacturer serial</label><input id="gearSerial" placeholder="SMK-TY-88231"></div>
+          </div>
+          <label for="gearUri">Metadata URI</label><input id="gearUri" placeholder="https://.../metadata/gear-101.json">
+          <div class="actions"><button id="gearBtn">Mint certificate</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="log"></div>
+
+  <script src="ethers.umd.min.js"></script>
+  <script src="abis.js"></script>
+  <script src="config.js"></script>
+  <script src="web3.js"></script>
+  <script src="apex.js"></script>
+</body>
+</html>

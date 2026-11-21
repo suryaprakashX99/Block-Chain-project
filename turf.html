@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Elite Strikers Turf Club - Member Portal</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Crect width=%2232%22 height=%2232%22 rx=%228%22 fill=%22%231e293b%22/%3E%3Ctext x=%2216%22 y=%2223%22 font-size=%2220%22 text-anchor=%22middle%22 fill=%22white%22%3E%CE%9E%3C/text%3E%3C/svg%3E">
+</head>
+<body class="turf">
+  <header class="site">
+    <a class="logo" href="turf.html">
+      <div class="logo-mark">ES</div>
+      <div class="logo-text"><b>Elite Strikers Turf Club</b><small>Member &amp; booking portal</small></div>
+    </a>
+    <nav class="links">
+      <a href="index.html">Home</a>
+      <a href="apex.html">Apex Auto</a>
+      <button id="connectBtn">Connect MetaMask</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <h1>Book pitches and pay fees with StrikeCoin</h1>
+    <p>Pay for bookings in STRK, get your Elite Pass discount applied automatically, and see every fee and prize payment on the public ledger.</p>
+    <div class="chips"><span class="chip accent" id="roleChip">Not connected</span><span class="chip">STRK · ERC-20</span><span class="chip">EPASS · ERC-721</span></div>
+  </section>
+
+  <main>
+    <div class="notice" id="configNotice" hidden></div>
+
+    <div class="grid">
+      <!-- Wallet summary -->
+      <div class="card">
+        <span class="tag">My wallet</span>
+        <h2>Balance &amp; membership</h2>
+        <p class="sub">Read directly from the two contracts.</p>
+        <div class="stat"><span>StrikeCoin balance</span><b id="strkBalance">-</b></div>
+        <div class="stat"><span>Elite Pass</span><b id="passStatus">-</b></div>
+        <div class="stat"><span>Season</span><b id="passSeason">-</b></div>
+        <div class="stat"><span>Booking discount</span><b id="passDiscount">-</b></div>
+      </div>
+
+      <!-- Booking -->
+      <div class="card">
+        <span class="tag erc20">ERC-20 · payMatchFee</span>
+        <h2>Book a pitch</h2>
+        <p class="sub">The booking reference is stored with the payment, so a paid slot cannot be booked twice.</p>
+        <label for="pitch">Pitch</label>
+        <select id="pitch"></select>
+        <div class="row">
+          <div><label for="bookDate">Date</label><input type="date" id="bookDate"></div>
+          <div><label for="bookType">Booking type</label>
+            <select id="bookType">
+              <option value="hour">Hourly</option>
+              <option value="day">Full day</option>
+            </select>
+          </div>
+        </div>
+        <div id="hourWrap">
+          <label for="bookHour">Start time</label>
+          <select id="bookHour"></select>
+        </div>
+        <div class="actions">
+          <span class="price">Price: <b id="price">-</b> <span id="priceNote"></span></span>
+        </div>
+        <div class="actions">
+          <button id="payBtn">Pay with STRK</button>
+        </div>
+      </div>
+
+      <!-- Activity -->
+      <div class="card">
+        <span class="tag">Public ledger</span>
+        <h2>Recent club payments</h2>
+        <p class="sub">Fees paid and prizes awarded, read from contract events.</p>
+        <ul class="feed" id="feed"><li class="empty">Connect your wallet to load activity.</li></ul>
+      </div>
+    </div>
+
+    <!-- Staff only -->
+    <section class="staff-zone" id="staffZone" hidden>
+      <h3><span class="tag staff">Club treasury only</span> Staff tools</h3>
+      <div class="grid">
+        <div class="card">
+          <span class="tag erc20">ERC-20 · transfer</span>
+          <h2>Sell STRK to a team</h2>
+          <p class="sub">After a team pays by card or bank transfer, send them the matching STRK.</p>
+          <label for="sellTo">Team wallet address</label><input id="sellTo" placeholder="0x...">
+          <label for="sellAmt">Amount (STRK)</label><input id="sellAmt" type="number" min="1" placeholder="500">
+          <div class="actions"><button id="sellBtn">Send STRK</button></div>
+        </div>
+
+        <div class="card">
+          <span class="tag erc20">ERC-20 · payPrize</span>
+          <h2>Pay tournament prize</h2>
+          <p class="sub">Pays the winning squad from the treasury and records the tournament name.</p>
+          <label for="prizeTo">Winning squad wallet</label><input id="prizeTo" placeholder="0x...">
+          <div class="row">
+            <div><label for="prizeAmt">Prize (STRK)</label><input id="prizeAmt" type="number" min="1" placeholder="1000"></div>
+            <div><label for="prizeName">Tournament</label><input id="prizeName" placeholder="EPL Cricket 2026"></div>
+          </div>
+          <div class="actions"><button id="prizeBtn">Pay prize</button></div>
+        </div>
+
+        <div class="card">
+          <span class="tag erc721">ERC-721 · mint</span>
+          <h2>Issue Elite Pass</h2>
+          <p class="sub">One pass per member wallet. Passes cannot be transferred.</p>
+          <label for="passTo">Member wallet</label><input id="passTo" placeholder="0x...">
+          <div class="row">
+            <div><label for="passId">Pass number</label><input id="passId" type="number" min="1" placeholder="1"></div>
+            <div><label for="passSeasonIn">Season</label><input id="passSeasonIn" type="number" value="2026"></div>
+          </div>
+          <div class="row">
+            <div><label for="passDisc">Discount %</label><input id="passDisc" type="number" min="0" max="50" value="10"></div>
+            <div><label for="passUri">Metadata URI</label><input id="passUri" placeholder="https://.../metadata/pass-1.json"></div>
+          </div>
+          <div class="actions"><button id="mintPassBtn">Mint pass</button></div>
+        </div>
+
+        <div class="card">
+          <span class="tag erc721">ERC-721 · revoke</span>
+          <h2>Cancel a membership</h2>
+          <p class="sub">Burns the pass. The wallet loses its discount immediately.</p>
+          <label for="revokeId">Pass number</label><input id="revokeId" type="number" min="1">
+          <div class="actions"><button id="revokeBtn" class="secondary">Revoke pass</button></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="log"></div>
+
+  <script src="ethers.umd.min.js"></script>
+  <script src="abis.js"></script>
+  <script src="config.js"></script>
+  <script src="web3.js"></script>
+  <script src="turf.js"></script>
+</body>
+</html>
