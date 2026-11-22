@@ -29,6 +29,19 @@ const App = {
     if (type === "ok" || type === "info") setTimeout(() => item.remove(), 15000);
   },
 
+  // ---------- NFT metadata ----------
+  // Full public URL of an image hosted with the site.
+  assetUrl(file) { return new URL((CONFIG.assetPath || "") + file, location.href).href; },
+
+  // Packs a metadata object into a self-contained tokenURI
+  // (data:application/json;base64,...), so no JSON file needs hosting.
+  dataUri(obj) {
+    const bytes = new TextEncoder().encode(JSON.stringify(obj));
+    let bin = "";
+    bytes.forEach(b => { bin += String.fromCharCode(b); });
+    return "data:application/json;base64," + btoa(bin);
+  },
+
   // ---------- wallet connection ----------
   async connect() {
     if (!window.ethereum) {

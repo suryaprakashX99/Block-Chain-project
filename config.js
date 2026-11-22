@@ -30,6 +30,9 @@ window.CONFIG = {
     ApexGear:   0
   },
 
+  // Folder holding the NFT images (used when the site builds token metadata automatically).
+  assetPath: "",
+
   // Business rules used by the website (kept off-chain so staff can change them).
   turf: {
     pitches: ["Pitch A - 5-a-side football", "Pitch B - Cricket nets", "Pitch C - Full-size rugby"],

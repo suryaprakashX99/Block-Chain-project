@@ -101,12 +101,36 @@
     if (r) refresh();
   };
 
+  // Picks the certificate artwork that matches the product.
+  function gearImage(product) {
+    const p = product.toLowerCase();
+    if (p.includes("helmet")) return "apex-gear-helmet.png";
+    if (p.includes("glove")) return "apex-gear-gloves.png";
+    if (p.includes("boot")) return "apex-gear-boots.png";
+    return "apex-gear-jacket.png";
+  }
+
   $("gearBtn").onclick = async () => {
+    const id = BigInt($("gearId").value || 0);
     const size = $("gearSize").value.trim();
+    const serial = $("gearSerial").value.trim();
     const product = $("gearProduct").value + (size ? ` - Size ${size}` : "");
-    const r = await App.send("Certify gear", () => gear.mint(
-      $("gearTo").value.trim(), BigInt($("gearId").value || 0), $("gearUri").value.trim(),
-      product, $("gearSerial").value.trim()));
+
+    // Use a typed URI if given, otherwise build the metadata from the form.
+    const uri = $("gearUri").value.trim() || App.dataUri({
+      name: `Apex Authentic Gear #${id}`,
+      description: "Certificate of authenticity issued by Apex Auto & Trail Mechanics at point of sale. Transfers with the item on resale.",
+      image: App.assetUrl(gearImage(product)),
+      attributes: [
+        { trait_type: "Product", value: $("gearProduct").value },
+        { trait_type: "Size", value: size || "-" },
+        { trait_type: "Serial", value: serial },
+        { trait_type: "Sold by", value: "Apex Auto & Trail Mechanics" },
+        { trait_type: "Certified", value: new Date().toISOString().slice(0, 10) }
+      ]
+    });
+
+    const r = await App.send("Certify gear", () => gear.mint($("gearTo").value.trim(), id, uri, product, serial));
     if (r) refresh();
   };
 

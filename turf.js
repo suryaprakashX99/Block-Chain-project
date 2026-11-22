@@ -116,9 +116,23 @@
   };
 
   $("mintPassBtn").onclick = async () => {
-    const r = await App.send("Mint Elite Pass", () => pass.mint(
-      $("passTo").value.trim(), BigInt($("passId").value || 0), $("passUri").value.trim(),
-      Number($("passSeasonIn").value), Number($("passDisc").value)));
+    const id = BigInt($("passId").value || 0);
+    const season = Number($("passSeasonIn").value);
+    const disc = Number($("passDisc").value);
+
+    // Use a typed URI if given, otherwise build the metadata from the form.
+    const uri = $("passUri").value.trim() || App.dataUri({
+      name: `Elite Strikers Season Pass #${id}`,
+      description: "Seasonal membership of Elite Strikers Turf Club, Dublin. Grants member booking discounts for the season shown. Non-transferable.",
+      image: App.assetUrl("elite-pass.png"),
+      attributes: [
+        { trait_type: "Season", value: season },
+        { trait_type: "Booking discount", value: `${disc}%` },
+        { trait_type: "Club", value: "Elite Strikers Turf Club" }
+      ]
+    });
+
+    const r = await App.send("Mint Elite Pass", () => pass.mint($("passTo").value.trim(), id, uri, season, disc));
     if (r) refresh();
   };
 
