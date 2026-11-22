@@ -53,14 +53,17 @@
       const id = await pass.passOf(App.account);
       if (id > 0n) {
         discount = Number(await pass.discountPercent(id));
+        const season = Number(await pass.seasonOf(id));
         $("passStatus").textContent = `Active · #${id}`;
-        $("passSeason").textContent = String(await pass.seasonOf(id));
+        $("passSeason").textContent = String(season);
         $("passDiscount").textContent = `${discount}%`;
+        renderLounge(id, season, discount);
       } else {
         discount = 0;
         $("passStatus").textContent = "None";
         $("passSeason").textContent = "-";
         $("passDiscount").textContent = "0%";
+        renderLounge(null);
       }
     }
     updatePrice();
@@ -149,13 +152,126 @@
     });
 
     const r = await App.send("Mint Elite Pass", () => pass.mint($("passTo").value.trim(), id, uri, season, disc));
-    if (r) refresh();
+    if (r) { refresh(); loadDashboard(); }
   };
 
   $("revokeBtn").onclick = async () => {
     const r = await App.send("Revoke Elite Pass", () => pass.revoke(BigInt($("revokeId").value || 0)));
-    if (r) refresh();
+    if (r) { refresh(); loadDashboard(); }
   };
+
+  // ---------- Member lounge + 3D Elite Pass card ----------
+  const hero = document.querySelector(".hero h1"), heroP = document.querySelector(".hero p");
+  const heroDefault = [hero.innerHTML, heroP.innerHTML];
+  async function renderLounge(id, season, disc) {
+    const member = id !== null;
+    document.body.classList.toggle("member", member);
+    $("lounge").classList.toggle("locked", !member);
+    // Members can book 30 days ahead, everyone else 7.
+    const max = new Date(Date.now() + (member ? 30 : 7) * 86400000).toISOString().slice(0, 10);
+    $("bookDate").max = max;
+    if ($("bookDate").value > max) $("bookDate").value = max;
+    $("bfCash").textContent = `${cbPct}% STRK cashback`;
+    if (!member) {
+      hero.innerHTML = heroDefault[0]; heroP.innerHTML = heroDefault[1];
+      $("loungeTitle").textContent = "Unlock the Elite Pass";
+      $("loungeStats").hidden = true; $("passLock").hidden = false;
+      $("pcOwner").textContent = "MEMBERS ONLY"; $("pcNum").textContent = "#----";
+      return;
+    }
+    hero.innerHTML = "Welcome back,<br>Elite member";
+    heroP.innerHTML = `Your Season ${season} pass is active: <b>${disc}% off</b> every booking, a 30-day booking window and ${cbPct}% STRK back on every game.`;
+    $("loungeTitle").textContent = "Your Elite Pass";
+    $("loungeTag").textContent = `Member #${id} · Season ${season}`;
+    $("loungeSub").textContent = "Your membership lives in your wallet as a non-transferable NFT. These benefits are applied automatically whenever you book.";
+    $("bfDisc").textContent = `${disc}% off every booking`;
+    $("passLock").hidden = true;
+    $("pcSeason").textContent = `SEASON ${season}`; $("pcSeason2").textContent = String(season);
+    $("pcNum").textContent = `#${String(id).padStart(4, "0")}`;
+    $("pcOwner").textContent = App.short(App.account);
+    $("pcWallet").textContent = App.account; $("pcToken").textContent = `#${id}`; $("pcDisc").textContent = `${disc}%`;
+    $("pcContract").textContent = App.short(CONFIG.contracts.ElitePass);
+    // Decorative member code generated from the wallet address.
+    const hex = App.account.slice(2).toLowerCase();
+    $("pcQr").innerHTML = Array.from({ length: 49 }, (_, i) => `<i style="opacity:${parseInt(hex[i % 40], 16) > 6 ? 1 : 0.12}"></i>`).join("");
+    // Personal stats from on-chain events.
+    if (App.isConfigured("StrikeCoin")) {
+      const [fees, rewards] = await Promise.all([App.events(strk, "MatchFeePaid", CONFIG.deployBlock.StrikeCoin), App.events(strk, "RewardEarned", CONFIG.deployBlock.StrikeCoin)]);
+      const mine = fees.filter(l => l.args.team.toLowerCase() === App.account.toLowerCase());
+      const paid = mine.reduce((s, l) => s + Number(ethers.formatUnits(l.args.amount, decimals)), 0);
+      const cash = rewards.filter(l => l.args.team.toLowerCase() === App.account.toLowerCase()).reduce((s, l) => s + Number(ethers.formatUnits(l.args.amount, decimals)), 0);
+      $("lsBookings").textContent = mine.length;
+      $("lsSaved").textContent = `${(paid * disc / (100 - disc)).toFixed(1)} STRK`;
+      $("lsCash").textContent = `${cash.toFixed(1)} STRK`;
+      $("loungeStats").hidden = false;
+    }
+  }
+  // Card interaction: tilt with the pointer, click to flip.
+  const card = $("pass3d"), inner = $("passInner");
+  let flipped = false;
+  card.addEventListener("pointermove", e => {
+    const r = card.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5;
+    inner.style.transform = `rotateY(${(flipped ? 180 : 0) + x * 28}deg) rotateX(${-y * 22}deg)`;
+    card.style.setProperty("--hx", `${(x + 0.5) * 100}%`); card.style.setProperty("--hy", `${(y + 0.5) * 100}%`);
+  });
+  card.addEventListener("pointerleave", () => { inner.style.transform = `rotateY(${flipped ? 180 : 0}deg)`; });
+  card.addEventListener("click", () => { flipped = !flipped; inner.style.transform = `rotateY(${flipped ? 180 : 0}deg)`; });
+
+  // ---------- Club dashboard (staff) ----------
+  async function loadDashboard() {
+    if (!App.isConfigured("StrikeCoin") || !App.isConfigured("ElitePass")) return;
+    const [issued, revoked, fees, rewards] = await Promise.all([
+      App.events(pass, "PassIssued", CONFIG.deployBlock.ElitePass), App.events(pass, "PassRevoked", CONFIG.deployBlock.ElitePass),
+      App.events(strk, "MatchFeePaid", CONFIG.deployBlock.StrikeCoin), App.events(strk, "RewardEarned", CONFIG.deployBlock.StrikeCoin)]);
+    const gone = new Set(revoked.map(l => String(l.args.tokenId)));
+    const members = issued.filter(l => !gone.has(String(l.args.tokenId))).reverse();
+    const memberSet = new Set(members.map(l => l.args.member.toLowerCase()));
+    const bookingsBy = {};
+    fees.forEach(l => { const k = l.args.team.toLowerCase(); bookingsBy[k] = (bookingsBy[k] || 0) + 1; });
+
+    const revenue = fees.reduce((s, l) => s + Number(ethers.formatUnits(l.args.amount, decimals)), 0);
+    const cash = rewards.reduce((s, l) => s + Number(ethers.formatUnits(l.args.amount, decimals)), 0);
+    const memberBookings = fees.filter(l => memberSet.has(l.args.team.toLowerCase())).length;
+    $("kMembers").textContent = members.length;
+    $("kBookings").textContent = fees.length;
+    $("kRevenue").textContent = `${revenue.toLocaleString(undefined, { maximumFractionDigits: 1 })} STRK`;
+    $("kCash").textContent = `${cash.toLocaleString(undefined, { maximumFractionDigits: 1 })} STRK`;
+    $("kShare").textContent = fees.length ? `${Math.round(memberBookings / fees.length * 100)}%` : "-";
+
+    const memberRows = await Promise.all(members.map(async l => `<tr>
+      <td><b>#${l.args.tokenId}</b></td><td>${App.addrCell(l.args.member)}</td><td>${l.args.season}</td><td>${l.args.discount}%</td>
+      <td>${App.fmtDate(await App.blockTime(l.blockNumber))}</td><td>${bookingsBy[l.args.member.toLowerCase()] || 0}</td></tr>`));
+    $("tMembers").innerHTML = memberRows.join("") || `<tr><td colspan="6" class="empty">No active members yet.</td></tr>`;
+
+    // Pitch usage (hours booked per pitch; a full day counts as 12 h).
+    const hours = {};
+    fees.forEach(l => { const [, , p, s] = l.args.bookingRef.split("|"); if (p) hours[p] = (hours[p] || 0) + (s === "DAY" ? 12 : 1); });
+    const maxH = Math.max(1, ...Object.values(hours));
+    $("pitchBars").innerHTML = cfg.pitches.map((name, i) => {
+      const k = String.fromCharCode(65 + i), h = hours[k] || 0;
+      return `<div class="bar"><span>${name}</span><div><i style="width:${h / maxH * 100}%"></i></div><b>${h} h</b></div>`;
+    }).join("");
+
+    const today = new Date().toISOString().slice(0, 10);
+    const rows = await Promise.all(fees.map(async l => {
+      const [, date, p, slot] = l.args.bookingRef.split("|");
+      return { date: date || "-", pitch: p ? cfg.pitches[p.charCodeAt(0) - 65] || p : "-", slot: slot === "DAY" ? "Full day" : slot ? `${slot}:00` : "-",
+        team: l.args.team, member: memberSet.has(l.args.team.toLowerCase()), amt: Number(ethers.formatUnits(l.args.amount, decimals)),
+        at: await App.blockTime(l.blockNumber), hash: l.transactionHash, upcoming: (date || "") >= today };
+    }));
+    const draw = () => {
+      const f = $("bookFilter").value;
+      const list = rows.filter(r => f === "all" || (f === "upcoming" && r.upcoming) || (f === "past" && !r.upcoming) || (f === "members" && r.member))
+        .sort((a, b) => (a.date < b.date ? 1 : -1));
+      $("tBookings").innerHTML = list.map(r => `<tr class="${r.upcoming ? "" : "past"}">
+        <td><b>${r.date}</b></td><td>${App.escape(r.pitch)}</td><td>${r.slot}</td><td>${App.addrCell(r.team)}</td>
+        <td>${r.member ? '<span class="pill gold">Elite</span>' : "-"}</td><td>${r.amt.toLocaleString(undefined, { maximumFractionDigits: 2 })} STRK</td>
+        <td>${App.fmtDate(r.at)}</td><td><a href="${App.txLink(r.hash)}" target="_blank" rel="noopener">↗</a></td></tr>`).join("")
+        || `<tr><td colspan="8" class="empty">No bookings match.</td></tr>`;
+    };
+    $("bookFilter").onchange = draw; draw();
+  }
+  $("dashRefresh").onclick = () => loadDashboard().catch(e => App.log(App.reason(e), "error"));
 
   // ---------- STRK exchange ----------
   function updateQuote() {
@@ -208,6 +324,7 @@
         isClub = isClub || (await pass.owner()).toLowerCase() === App.account.toLowerCase();
       }
       App.setupRole(isClub, "Signed in as club treasury", "Signed in as team / member");
+      if (isClub) loadDashboard().catch(e => App.log(App.reason(e), "error"));
       await refresh();
     } catch (e) {
       App.log(App.reason(e), "error");

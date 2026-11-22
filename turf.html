@@ -98,6 +98,55 @@
       </div>
     </div>
 
+    <!-- Member lounge (unlocks when the wallet holds an Elite Pass) -->
+    <section class="lounge locked" id="lounge">
+      <div class="lounge-card">
+        <div class="pass3d" id="pass3d" title="Click to flip">
+          <div class="pass-inner" id="passInner">
+            <div class="pass-face pass-front" id="passFront">
+              <div class="pass-holo"></div>
+              <div class="pass-layer pass-logo">ES</div>
+              <div class="pass-layer pass-title"><small>Elite Strikers Turf Club</small><b>ELITE PASS</b></div>
+              <div class="pass-layer pass-season" id="pcSeason">2026</div>
+              <div class="pass-layer pass-chip"></div>
+              <div class="pass-layer pass-num" id="pcNum">#----</div>
+              <div class="pass-layer pass-owner" id="pcOwner">MEMBERS ONLY</div>
+            </div>
+            <div class="pass-face pass-back">
+              <div class="pass-stripe"></div>
+              <dl>
+                <dt>Member wallet</dt><dd id="pcWallet">-</dd>
+                <dt>Pass</dt><dd id="pcToken">-</dd>
+                <dt>Season</dt><dd id="pcSeason2">-</dd>
+                <dt>Booking discount</dt><dd id="pcDisc">-</dd>
+                <dt>Standard</dt><dd>ERC-721 · non-transferable</dd>
+                <dt>Contract</dt><dd id="pcContract">-</dd>
+              </dl>
+              <div class="pass-qr" id="pcQr"></div>
+            </div>
+          </div>
+          <div class="pass-lock" id="passLock">🔒</div>
+        </div>
+        <p class="pass-tip" id="passTip">Move your mouse over the card · click to flip</p>
+      </div>
+      <div class="lounge-info">
+        <span class="tag erc721" id="loungeTag">Elite Pass · ERC-721</span>
+        <h2 id="loungeTitle">Unlock the Elite Pass</h2>
+        <p class="sub" id="loungeSub">Members get a season-long booking discount and a longer booking window. Ask at the club desk to join - your pass is minted straight to your wallet.</p>
+        <ul class="benefits" id="benefits">
+          <li><i>%</i><div><b id="bfDisc">Up to 50% off every booking</b><span>Applied automatically at checkout, read from your pass on-chain.</span></div></li>
+          <li><i>⏱</i><div><b>Book 30 days ahead</b><span>Non-members can book 7 days ahead.</span></div></li>
+          <li><i>↺</i><div><b id="bfCash">5% STRK cashback</b><span>On every booking - stacks with your discount.</span></div></li>
+          <li><i>★</i><div><b>Verified member badge</b><span>Your pass is proof of membership anyone can check on Etherscan.</span></div></li>
+        </ul>
+        <div class="lounge-stats" id="loungeStats" hidden>
+          <div><span>Your bookings</span><b id="lsBookings">0</b></div>
+          <div><span>Saved with discount</span><b id="lsSaved">0 STRK</b></div>
+          <div><span>Cashback earned</span><b id="lsCash">0 STRK</b></div>
+        </div>
+      </div>
+    </section>
+
     <section class="ride" id="ride" aria-hidden="true"></section>
 
     <!-- Half-time XOXO -->
@@ -149,7 +198,31 @@
 
     <!-- Staff only -->
     <section class="staff-zone" id="staffZone" hidden>
-      <h3><span class="tag staff">Club treasury only</span> Staff tools</h3>
+      <h3><span class="tag staff">Club treasury only</span> Club dashboard</h3>
+      <div class="kpis" id="clubKpis">
+        <div><span>Active members</span><b id="kMembers">-</b></div>
+        <div><span>Bookings</span><b id="kBookings">-</b></div>
+        <div><span>Fee revenue</span><b id="kRevenue">-</b></div>
+        <div><span>Cashback paid</span><b id="kCash">-</b></div>
+        <div><span>Members' share of bookings</span><b id="kShare">-</b></div>
+      </div>
+      <div class="dash-grid">
+        <div class="card dash">
+          <div class="dash-head"><h2>Elite Pass members</h2><button type="button" class="ghost" id="dashRefresh">Refresh</button></div>
+          <div class="table-wrap"><table class="dtable"><thead><tr><th>Pass</th><th>Member</th><th>Season</th><th>Discount</th><th>Issued</th><th>Bookings</th></tr></thead><tbody id="tMembers"><tr><td colspan="6" class="empty">Loading…</td></tr></tbody></table></div>
+        </div>
+        <div class="card dash">
+          <div class="dash-head"><h2>Pitch usage</h2></div>
+          <div id="pitchBars" class="bars"></div>
+        </div>
+      </div>
+      <div class="card dash" style="margin-top:20px">
+        <div class="dash-head"><h2>Who booked what</h2>
+          <select id="bookFilter" style="width:auto"><option value="all">All bookings</option><option value="upcoming">Upcoming</option><option value="past">Past</option><option value="members">Members only</option></select></div>
+        <div class="table-wrap"><table class="dtable"><thead><tr><th>Match date</th><th>Pitch</th><th>Slot</th><th>Team wallet</th><th>Member</th><th>Paid</th><th>Booked at</th><th></th></tr></thead><tbody id="tBookings"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody></table></div>
+      </div>
+
+      <h3 style="margin-top:34px"><span class="tag staff">Club treasury only</span> Staff tools</h3>
       <div class="grid">
         <div class="card">
           <span class="tag erc20">ERC-20 · transfer</span>

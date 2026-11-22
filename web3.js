@@ -131,6 +131,10 @@ const App = {
       let staffView = true;
       toggle.onclick = () => { staffView = !staffView; apply(staffView); };
       this.$("switchBtn")?.after(toggle);
+      const dash = document.createElement("button");
+      dash.type = "button"; dash.className = "ghost"; dash.textContent = "Dashboard";
+      dash.onclick = () => { if (zone.hidden) toggle.click(); zone.scrollIntoView({ behavior: "smooth", block: "start" }); };
+      toggle.after(dash);
     }
     apply(isStaff);
   },
@@ -183,6 +187,18 @@ const App = {
     } catch (e) {
       return (await contract.queryFilter(filter, Math.max(0, latest - 9000), latest)).reverse();
     }
+  },
+
+  // Block timestamp (cached) -> Date, used by the dashboards.
+  _blockCache: {},
+  async blockTime(n) {
+    if (!this._blockCache[n]) this._blockCache[n] = this.provider.getBlock(n).then(b => new Date(Number(b.timestamp) * 1000));
+    return this._blockCache[n];
+  },
+  fmtDate(d) { return d.toLocaleDateString(undefined, { day: "2-digit", month: "short" }) + " " + d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" }); },
+  addrCell(a) {
+    const me = this.account && a.toLowerCase() === this.account.toLowerCase();
+    return `<a href="${this.addrLink(a)}" target="_blank" rel="noopener" class="mono">${this.short(a)}</a>${me ? ' <span class="pill">you</span>' : ""}`;
   },
 
   // Turns ethers/MetaMask errors into a readable sentence (e.g. the contract's require message).

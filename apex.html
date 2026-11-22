@@ -161,7 +161,25 @@
 
     <!-- Staff only -->
     <section class="staff-zone" id="staffZone" hidden>
-      <h3><span class="tag staff">Garage staff only</span> Counter tools</h3>
+      <h3><span class="tag staff">Garage staff only</span> Garage dashboard</h3>
+      <div class="kpis">
+        <div><span>Service customers</span><b id="kCust">-</b></div>
+        <div><span>Services logged</span><b id="kServices">-</b></div>
+        <div><span>Points issued</span><b id="kIssued">-</b></div>
+        <div><span>Points redeemed</span><b id="kRedeemed">-</b></div>
+        <div><span>Gear certified</span><b id="kGear">-</b></div>
+        <div><span>Resold items</span><b id="kResold">-</b></div>
+      </div>
+      <div class="card dash">
+        <div class="dash-head"><h2>Service customers</h2><button type="button" class="ghost" id="dashRefresh">Refresh</button></div>
+        <div class="table-wrap"><table class="dtable"><thead><tr><th>Customer</th><th>Visits</th><th>Invoices</th><th>Points earned</th><th>Redeemed</th><th>Balance</th><th>Last visit</th></tr></thead><tbody id="tCustomers"><tr><td colspan="7" class="empty">Loading…</td></tr></tbody></table></div>
+      </div>
+      <div class="card dash" style="margin-top:20px">
+        <div class="dash-head"><h2>Gear register: who bought it, who owns it now</h2></div>
+        <div class="table-wrap"><table class="dtable"><thead><tr><th>Cert</th><th>Product</th><th>Serial</th><th>Sold to</th><th>Current owner</th><th>Owners</th><th>Certified</th><th>Status</th></tr></thead><tbody id="tGear"><tr><td colspan="8" class="empty">Loading…</td></tr></tbody></table></div>
+      </div>
+
+      <h3 style="margin-top:34px"><span class="tag staff">Garage staff only</span> Counter tools</h3>
       <div class="grid">
         <div class="card">
           <span class="tag erc20">ERC-20 · rewardService</span>

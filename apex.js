@@ -98,7 +98,7 @@
   $("rewBtn").onclick = async () => {
     const points = BigInt(Math.floor(Number($("rewEuro").value || 0) * cfg.pointsPerEuro));
     const r = await App.send("Reward points", () => pts.rewardService($("rewTo").value.trim(), points, $("rewInv").value.trim()));
-    if (r) refresh();
+    if (r) { refresh(); loadDashboard(); }
   };
 
   // Picks the certificate artwork that matches the product.
@@ -134,6 +134,49 @@
     if (r) refresh();
   };
 
+  // ---------- Garage dashboard (staff) ----------
+  async function loadDashboard() {
+    if (!App.isConfigured("ApexPoints") || !App.isConfigured("ApexGear")) return;
+    const [rewards, redeems, certs, transfers] = await Promise.all([
+      App.events(pts, "PointsRewarded", CONFIG.deployBlock.ApexPoints), App.events(pts, "PointsRedeemed", CONFIG.deployBlock.ApexPoints),
+      App.events(gear, "GearCertified", CONFIG.deployBlock.ApexGear), App.events(gear, "Transfer", CONFIG.deployBlock.ApexGear)]);
+
+    // Service customers: everyone who received points for a job.
+    const cust = {};
+    const row = a => (cust[a.toLowerCase()] ||= { addr: a, visits: 0, invoices: [], earned: 0n, redeemed: 0n, last: 0 });
+    rewards.forEach(l => { const c = row(l.args.customer); c.visits++; c.invoices.push(l.args.invoiceRef); c.earned += l.args.points; c.last = Math.max(c.last, l.blockNumber); });
+    redeems.forEach(l => { row(l.args.customer).redeemed += l.args.points; });
+    const customers = Object.values(cust).filter(c => c.visits > 0).sort((a, b) => b.last - a.last);
+    const issuedTotal = rewards.reduce((s, l) => s + l.args.points, 0n), redeemedTotal = redeems.reduce((s, l) => s + l.args.points, 0n);
+    const custRows = await Promise.all(customers.map(async c => `<tr>
+      <td>${App.addrCell(c.addr)}</td><td><b>${c.visits}</b></td><td class="small">${c.invoices.slice(-3).map(App.escape).join(", ")}${c.invoices.length > 3 ? " …" : ""}</td>
+      <td>${c.earned.toLocaleString()}</td><td>${c.redeemed.toLocaleString()}</td><td><b>${(await pts.balanceOf(c.addr)).toLocaleString()}</b></td>
+      <td>${App.fmtDate(await App.blockTime(c.last))}</td></tr>`));
+    $("tCustomers").innerHTML = custRows.join("") || `<tr><td colspan="7" class="empty">No services logged yet.</td></tr>`;
+
+    // Gear register: original buyer vs current owner, from mint + Transfer history.
+    const owners = {};
+    transfers.slice().reverse().forEach(l => { const k = String(l.args._tokenId ?? l.args.tokenId ?? l.args[2]); (owners[k] ||= []).push(l.args._to ?? l.args.to ?? l.args[1]); });
+    let resold = 0;
+    const gearRows = await Promise.all(certs.map(async l => {
+      const id = l.args.tokenId, chain = owners[String(id)] || [l.args.buyer];
+      let current = chain[chain.length - 1];
+      try { current = (await gear.verifyGear(id))[2]; } catch {}
+      const moved = current.toLowerCase() !== l.args.buyer.toLowerCase();
+      if (moved) resold++;
+      return `<tr><td><b>#${id}</b></td><td>${App.escape(l.args.product)}</td><td class="mono small">${App.escape(l.args.serialNumber)}</td>
+        <td>${App.addrCell(l.args.buyer)}</td><td>${App.addrCell(current)}</td><td>${new Set(chain.map(a => a.toLowerCase())).size}</td>
+        <td>${App.fmtDate(await App.blockTime(l.blockNumber))}</td>
+        <td>${moved ? '<span class="pill gold">Resold</span>' : '<span class="pill">Original owner</span>'}</td></tr>`;
+    }));
+    $("tGear").innerHTML = gearRows.join("") || `<tr><td colspan="8" class="empty">No gear certified yet.</td></tr>`;
+
+    $("kCust").textContent = customers.length; $("kServices").textContent = rewards.length;
+    $("kIssued").textContent = issuedTotal.toLocaleString(); $("kRedeemed").textContent = redeemedTotal.toLocaleString();
+    $("kGear").textContent = certs.length; $("kResold").textContent = resold;
+  }
+  $("dashRefresh").onclick = () => loadDashboard().catch(e => App.log(App.reason(e), "error"));
+
   // ---------- connect ----------
   $("connectBtn").onclick = async () => {
     if (!(await App.connect())) return;
@@ -147,6 +190,7 @@
         isGarage = isGarage || (await gear.owner()).toLowerCase() === App.account.toLowerCase();
       }
       App.setupRole(isGarage, "Signed in as garage staff", "Signed in as customer");
+      if (isGarage) loadDashboard().catch(e => App.log(App.reason(e), "error"));
       await refresh();
     } catch (e) {
       App.log(App.reason(e), "error");

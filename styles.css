@@ -502,3 +502,100 @@ main::before {
 .xo-confetti { position: absolute; inset: 0; pointer-events: none; }
 @media (max-width: 900px) { .xoxo-grid { grid-template-columns: 1fr; } .xo-side { flex-direction: row; } .xo-side .xo-score { flex: 1; } }
 .ws-paint[hidden], .ws-result[hidden] { display: none !important; }
+
+/* =====================================================================
+   DASHBOARDS (staff)
+   ===================================================================== */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpis > div { padding: 16px; border-radius: 16px; background: linear-gradient(160deg, rgba(255,255,255,.07), rgba(255,255,255,.02)); border: 1px solid var(--glass-line); position: relative; overflow: hidden; }
+.kpis > div::after { content: ""; position: absolute; right: -30px; top: -30px; width: 90px; height: 90px; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 35%, transparent), transparent); }
+.kpis span { display: block; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); }
+.kpis b { font-family: var(--display); font-weight: 400; font-size: 34px; letter-spacing: 1px; color: #fff; }
+.dash-grid { display: grid; grid-template-columns: 1.6fr 1fr; gap: 20px; }
+.dash-head { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 12px; }
+.dash-head h2 { margin: 0; }
+.table-wrap { overflow: auto; max-height: 420px; border-radius: 12px; border: 1px solid rgba(255,255,255,.06); }
+.dtable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.dtable th { position: sticky; top: 0; background: #1a1233; text-align: left; font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); padding: 10px 12px; white-space: nowrap; z-index: 1; }
+.dtable td { padding: 10px 12px; border-top: 1px solid rgba(255,255,255,.06); white-space: nowrap; }
+.dtable tbody tr:hover td { background: rgba(255,255,255,.035); }
+.dtable tr.past td { opacity: .55; }
+.dtable td.empty { text-align: center; color: var(--muted); padding: 22px; }
+.dtable .small { font-size: 11.5px; color: var(--muted); }
+.mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 12px; }
+.pill { display: inline-block; font-size: 10px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; padding: 2px 8px; border-radius: 99px; background: rgba(255,255,255,.1); color: var(--ink); }
+.pill.gold { background: linear-gradient(100deg, #ffd34d, #ff9f1a); color: #1a1000; }
+.bars { display: flex; flex-direction: column; gap: 14px; padding-top: 6px; }
+.bar { display: grid; grid-template-columns: 1fr auto; gap: 6px 10px; font-size: 13px; }
+.bar span { color: var(--muted); }
+.bar div { grid-column: 1 / -1; grid-row: 2; height: 12px; border-radius: 99px; background: rgba(255,255,255,.07); overflow: hidden; }
+.bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent-2)); box-shadow: 0 0 14px var(--accent); transition: width .8s ease; }
+@media (max-width: 900px) { .dash-grid { grid-template-columns: 1fr; } }
+
+/* =====================================================================
+   MEMBER LOUNGE + 3D ELITE PASS
+   ===================================================================== */
+.lounge { display: grid; grid-template-columns: minmax(300px, 440px) 1fr; gap: 40px; align-items: center; margin: 60px 0 10px; padding: 34px; border-radius: 26px;
+  background: radial-gradient(700px 400px at 20% 50%, rgba(255,211,77,.12), transparent 60%), linear-gradient(160deg, rgba(30,20,50,.85), rgba(10,8,22,.95));
+  border: 1px solid rgba(255,211,77,.25); box-shadow: 0 30px 80px rgba(0,0,0,.45); }
+.lounge.locked { border-color: var(--glass-line); background: linear-gradient(160deg, rgba(30,20,50,.7), rgba(10,8,22,.9)); }
+.lounge-info h2 { margin: 6px 0 8px; font-family: var(--display); font-weight: 400; font-size: clamp(36px, 5vw, 58px); letter-spacing: 1px; text-transform: uppercase; line-height: .95;
+  background: linear-gradient(90deg, #fff, #ffd34d); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.benefits { list-style: none; padding: 0; margin: 18px 0 0; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.benefits li { display: flex; gap: 12px; padding: 14px; border-radius: 14px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.08); }
+.benefits i { flex: none; width: 38px; height: 38px; border-radius: 12px; display: grid; place-items: center; font-style: normal; font-weight: 800; font-size: 18px; color: #1a1000; background: linear-gradient(140deg, #ffd34d, #ff9f1a); box-shadow: 0 0 18px rgba(255,211,77,.35); }
+.lounge.locked .benefits i { background: rgba(255,255,255,.12); color: var(--muted); box-shadow: none; }
+.benefits b { display: block; font-size: 14px; }
+.benefits span { font-size: 12px; color: var(--muted); }
+.lounge-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
+.lounge-stats > div { padding: 12px 14px; border-radius: 14px; background: rgba(255,211,77,.07); border: 1px solid rgba(255,211,77,.25); }
+.lounge-stats span { display: block; font-size: 10px; letter-spacing: 1.6px; text-transform: uppercase; color: var(--muted); }
+.lounge-stats b { font-family: var(--display); font-weight: 400; font-size: 26px; color: #ffd34d; }
+.lounge-stats[hidden] { display: none; }
+
+.pass3d { --hx: 50%; --hy: 50%; position: relative; perspective: 1100px; aspect-ratio: 1.586; width: 100%; cursor: pointer; }
+.pass-inner { position: absolute; inset: 0; transform-style: preserve-3d; transition: transform .5s cubic-bezier(.2,.8,.2,1); animation: cardFloat 6s ease-in-out infinite; }
+@keyframes cardFloat { 50% { translate: 0 -10px; } }
+.pass-face { position: absolute; inset: 0; border-radius: 22px; backface-visibility: hidden; -webkit-backface-visibility: hidden; overflow: hidden; transform-style: preserve-3d;
+  box-shadow: 0 30px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.18) inset; }
+.pass-front { background:
+  radial-gradient(120% 90% at 85% 0%, rgba(57,255,156,.55), transparent 50%),
+  radial-gradient(80% 80% at 0% 100%, rgba(45,226,230,.45), transparent 60%),
+  repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 2px, transparent 2px 12px),
+  linear-gradient(140deg, #0c3b2b, #071a22 60%, #12082a); }
+body.member .pass-front { background:
+  radial-gradient(120% 90% at 85% 0%, rgba(255,211,77,.65), transparent 50%),
+  radial-gradient(80% 80% at 0% 100%, rgba(57,255,156,.45), transparent 60%),
+  repeating-linear-gradient(135deg, rgba(255,255,255,.05) 0 2px, transparent 2px 12px),
+  linear-gradient(140deg, #1d3a16, #0b1a12 55%, #2a1a05); }
+.pass-holo { position: absolute; inset: 0; mix-blend-mode: color-dodge; opacity: .55; pointer-events: none;
+  background: radial-gradient(circle at var(--hx) var(--hy), rgba(255,255,255,.65), transparent 35%),
+    linear-gradient(115deg, transparent 20%, rgba(255,0,170,.35) 35%, rgba(0,255,220,.35) 45%, rgba(255,230,0,.35) 55%, transparent 70%);
+  background-size: 100% 100%, 250% 250%; background-position: 0 0, var(--hx) var(--hy); }
+.pass-layer { position: absolute; transform: translateZ(40px); }
+.pass-logo { top: 22px; left: 22px; width: 52px; height: 52px; border-radius: 14px; display: grid; place-items: center; font-family: var(--display); font-size: 24px; color: #0b1a12;
+  background: linear-gradient(140deg, #39ff9c, #2de2e6); box-shadow: 0 0 22px rgba(57,255,156,.6); transform: translateZ(60px); }
+body.member .pass-logo { background: linear-gradient(140deg, #ffe58a, #ffb01a); box-shadow: 0 0 22px rgba(255,211,77,.7); }
+.pass-title { top: 24px; left: 88px; }
+.pass-title small { display: block; font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,255,255,.75); }
+.pass-title b { font-family: var(--display); font-weight: 400; font-size: 30px; letter-spacing: 3px; color: #fff; text-shadow: 0 0 18px rgba(255,255,255,.35); }
+.pass-season { top: 28px; right: 22px; font-size: 11px; font-weight: 800; letter-spacing: 2px; padding: 4px 10px; border-radius: 99px; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.3); }
+.pass-chip { left: 26px; top: 46%; width: 54px; height: 40px; border-radius: 8px; background: linear-gradient(135deg, #fde68a, #b8860b); box-shadow: inset 0 0 0 2px rgba(0,0,0,.2); }
+.pass-num { left: 26px; bottom: 54px; font-family: var(--display); font-size: 40px; letter-spacing: 6px; color: #fff; text-shadow: 0 3px 0 rgba(0,0,0,.35), 0 0 22px rgba(255,255,255,.3); transform: translateZ(55px); }
+.pass-owner { left: 26px; bottom: 26px; font-size: 12px; letter-spacing: 3px; font-weight: 800; color: rgba(255,255,255,.8); }
+.pass-back { transform: rotateY(180deg); background: linear-gradient(160deg, #141022, #0b0918); padding: 0 20px 20px; }
+.pass-stripe { height: 46px; margin: 22px -20px 14px; background: linear-gradient(90deg, #111, #2a2a2a, #111); }
+.pass-back dl { display: grid; grid-template-columns: auto 1fr; gap: 5px 12px; margin: 0; font-size: 11.5px; padding-right: 96px; }
+.pass-back dt { color: var(--muted); } .pass-back dd { margin: 0; color: #fff; overflow-wrap: anywhere; font-weight: 600; }
+.pass-qr { position: absolute; right: 20px; bottom: 20px; width: 78px; height: 78px; padding: 6px; border-radius: 8px; background: #fff; display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; }
+.pass-qr i { background: #0b0918; border-radius: 1px; }
+.pass-lock { position: absolute; inset: 0; display: grid; place-items: center; font-size: 54px; border-radius: 22px; background: rgba(8,6,20,.55); backdrop-filter: blur(3px) grayscale(.6); pointer-events: none; }
+.pass-lock[hidden] { display: none; }
+.pass-tip { text-align: center; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted); margin-top: 18px; }
+@media (max-width: 900px) { .lounge { grid-template-columns: 1fr; } .benefits { grid-template-columns: 1fr; } }
+
+/* Member mode: the whole Turf page shifts to gold accents. */
+body.turf.member { --accent: #ffd34d; --accent-2: #39ff9c; }
+body.turf.member .hero h1 { background-image: linear-gradient(180deg, #fff 0%, #fff3c4 55%, #ffd34d 100%); filter: drop-shadow(0 4px 18px rgba(255,211,77,.35)); }
+body.turf.member .chip.accent { background: #ffd34d; box-shadow: 0 0 18px #ffd34d; }
+body.turf.member .logo-mark { background: linear-gradient(135deg, #ffe58a, #ffb01a); }
