@@ -94,6 +94,71 @@
 
     <section class="ride" id="ride" aria-hidden="true"></section>
 
+    <!-- The Workshop game -->
+    <section class="workshop" id="workshop">
+      <div class="ws-head">
+        <div>
+          <span class="tag erc20">Play &amp; earn · APXP</span>
+          <h2>The Workshop</h2>
+          <p class="sub">Build a 500cc single from a bare frame, or strip one down. Fit parts in a mechanically sound order, torque every bolt with the correct spanner from the spec sheet, then paint it to the customer's work order. A clean finish earns loyalty points on-chain.</p>
+        </div>
+        <div class="ws-start">
+          <button type="button" data-start="assemble">Level 1 · Build &amp; paint <small>150 APXP</small></button>
+          <button type="button" class="secondary" data-start="strip">Level 2 · Strip down <small>100 APXP</small></button>
+        </div>
+      </div>
+
+      <div class="ws-hud">
+        <div><span>Time</span><b id="wsTime">00:00</b></div>
+        <div><span>Parts</span><b id="wsParts">-</b></div>
+        <div><span>Bolts</span><b id="wsBolts">-</b></div>
+        <div><span>Mistakes</span><b id="wsMistakes">0</b></div>
+        <div><span>Hints</span><b id="wsHints">0</b></div>
+        <div class="ws-bar"><i id="wsProgress"></i></div>
+      </div>
+
+      <div class="ws-body">
+        <aside class="ws-panel">
+          <h3>Parts tray</h3>
+          <div class="ws-tray" id="wsTray"></div>
+        </aside>
+
+        <div class="ws-stage" id="wsStage">
+          <div class="ws-views">
+            <button type="button" data-view="right">Right</button><button type="button" data-view="left">Left</button>
+            <button type="button" data-view="front">Front</button><button type="button" data-view="engine">Engine</button><button type="button" data-view="top">Top</button>
+          </div>
+          <div class="ws-help">Drag to orbit · scroll to zoom · click to fit / torque</div>
+          <div class="ws-result" id="wsResult" hidden></div>
+        </div>
+
+        <aside class="ws-panel">
+          <h3>Tool rack</h3>
+          <div class="ws-tools" id="wsTools"></div>
+          <button type="button" class="ghost ws-hint" id="wsHint">💡 Hint (+30 s)</button>
+          <details class="ws-specbox"><summary>Torque spec sheet</summary><div class="ws-spec" id="wsSpec"></div></details>
+          <h3>Foreman</h3>
+          <ul class="ws-log" id="wsLog"><li>Pick a challenge above to start.</li></ul>
+        </aside>
+      </div>
+
+      <div class="ws-paint" id="wsPaint" hidden>
+        <div class="ws-order" id="wsOrder"></div>
+        <div class="ws-paint-main">
+          <h3>Paint shop</h3>
+          <div class="ws-zones" id="wsZones"></div>
+          <div class="ws-swatches" id="wsSwatches"></div>
+          <button type="button" id="wsSubmitPaint">Deliver to customer</button>
+        </div>
+      </div>
+
+      <div class="ws-board">
+        <h3>Leaderboard <button type="button" class="ghost" id="wsBoardRefresh">Refresh</button></h3>
+        <ul class="feed" id="wsBoard"></ul>
+      </div>
+    </section>
+
+
     <!-- Staff only -->
     <section class="staff-zone" id="staffZone" hidden>
       <h3><span class="tag staff">Garage staff only</span> Counter tools</h3>
@@ -148,6 +213,7 @@
   <script src="web3.js"></script>
   <script src="fx.js"></script>
   <script type="module" src="scene-apex.js"></script>
+  <script type="module" src="workshop.js"></script>
   <script src="apex.js"></script>
 </body>
 </html>

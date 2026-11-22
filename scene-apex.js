@@ -1,5 +1,6 @@
 // Apex Auto hero: an interactive neon sports car and touring motorbike (original low-poly models).
 import { createStage, neonEdges, glowDisc, switcher, THREE } from "./stage3d.js";
+import { buildBike } from "./bike-model.js";
 
 const host = document.getElementById("stage3d");
 if (host && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
@@ -65,43 +66,16 @@ if (host && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
   car.add(glowDisc(stage, "#ff3d8b", 7));
   car.scale.setScalar(0.95);
 
-  // ---------- BIKE ----------
+  // ---------- BIKE (the same detailed model used in the Workshop) ----------
+  const detailed = buildBike();
+  detailed.bolts.forEach(b => { b.ring.visible = false; });
   const bike = new THREE.Group();
+  detailed.root.position.x = 0.05;
+  bike.add(detailed.root);
+  bike.add(glowDisc(stage, "#ff8a3d", 2.6));
   const bikeWheels = [];
-  const makeBikeWheel = () => {
-    const w = new THREE.Group();
-    w.add(new THREE.Mesh(new THREE.TorusGeometry(0.58, 0.11, 16, 48), rubber));
-    w.add(new THREE.Mesh(new THREE.TorusGeometry(0.46, 0.02, 8, 48), glow("#2de2e6")));
-    for (let i = 0; i < 5; i++) {
-      const s = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.04, 0.04), chrome);
-      s.rotation.z = (i / 5) * Math.PI; w.add(s);
-    }
-    return w;
-  };
-  const rear = makeBikeWheel(); rear.position.set(-1.25, 0.69, 0);
-  const front = makeBikeWheel(); front.position.set(1.3, 0.69, 0);
-  bike.add(rear, front); bikeWheels.push(rear, front);
-
-  const tube = (pts, r, mat) => new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(...p))), 24, r, 10), mat);
-  bike.add(tube([[-1.25, 0.69, 0], [-0.3, 1.0, 0], [0.75, 1.55, 0]], 0.07, paint));           // main frame
-  bike.add(tube([[0.75, 1.55, 0], [1.05, 1.1, 0], [1.3, 0.69, 0]], 0.05, chrome));            // forks
-  bike.add(tube([[-1.25, 0.69, 0.12], [-0.4, 0.62, 0.22], [0.35, 0.5, 0.2]], 0.06, chrome));   // exhaust
-  bike.add(tube([[0.7, 1.75, -0.45], [0.8, 1.7, 0], [0.7, 1.75, 0.45]], 0.035, chrome));     // handlebar
-
-  const tank = new THREE.Mesh(new THREE.SphereGeometry(0.5, 32, 16), paint);
-  tank.scale.set(1.15, 0.55, 0.62); tank.position.set(0.25, 1.48, 0); bike.add(tank);
-  bike.add(neonEdges(new THREE.SphereGeometry(0.5, 10, 5).scale(1.15, 0.55, 0.62).translate(0.25, 1.48, 0), "#ff8a3d", 20));
-  const engine = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.55, 0.5), new THREE.MeshStandardMaterial({ color: "#1d1a28", metalness: 0.9, roughness: 0.35 }));
-  engine.position.set(-0.05, 0.85, 0); bike.add(engine);
-  bike.add(neonEdges(engine.geometry, "#ff3d8b").translateX(-0.05).translateY(0.85));
-  const seat = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.14, 0.42), new THREE.MeshStandardMaterial({ color: "#120f1c", roughness: 0.7 }));
-  seat.position.set(-0.6, 1.42, 0); seat.rotation.z = 0.12; bike.add(seat);
-  const headlamp = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.12, 24), glow("#e8fbff"));
-  headlamp.rotation.z = Math.PI / 2; headlamp.position.set(0.98, 1.5, 0); bike.add(headlamp);
-  const tailLamp = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.28), glow("#ff2d6f"));
-  tailLamp.position.set(-1.12, 1.38, 0); bike.add(tailLamp);
-  bike.add(glowDisc(stage, "#ff8a3d", 5.5));
-  bike.scale.setScalar(1.15);
+  detailed.root.traverse(o => { if (o.name === "spin") bikeWheels.push(o); });
+  bike.scale.setScalar(2.2);
   bike.visible = false;
 
   // Showroom turntable that grounds the models.
@@ -124,7 +98,7 @@ if (host && !matchMedia("(prefers-reduced-motion: reduce)").matches) {
     current = next;
   });
 
-  const targetScale = { car: 0.95, bike: 1.15 };
+  const targetScale = { car: 0.95, bike: 2.2 };
   stage.onTick((dt, t) => {
     carWheels.forEach(w => (w.rotation.z -= dt * 6));
     bikeWheels.forEach(w => (w.rotation.z -= dt * 6));

@@ -4,7 +4,7 @@
 (() => {
   const $ = id => App.$(id);
   const cfg = CONFIG.turf;
-  let strk, pass, decimals = 18n, discount = 0, isClub = false;
+  let strk, pass, decimals = 18n, discount = 0, isClub = false, rate = 10000n, cbPct = 5, xMode = "buy";
 
   // ---------- booking form setup ----------
   cfg.pitches.forEach((p, i) => $("pitch").add(new Option(p, String.fromCharCode(65 + i))));
@@ -28,14 +28,26 @@
     $("hourWrap").hidden = $("bookType").value === "day";
     $("price").textContent = `${finalPrice()} STRK`;
     $("priceNote").textContent = discount ? `(${basePrice()} less ${discount}% Elite Pass discount)` : "";
+    $("cashback").textContent = cbPct ? `+${Math.round(finalPrice() * cbPct) / 100} STRK back` : "";
   }
   ["bookType", "bookHour", "bookDate", "pitch"].forEach(id => $(id).addEventListener("change", updatePrice));
   updatePrice();
 
   // ---------- reads ----------
   async function refresh() {
+    $("ethBalance").textContent = `${Number(ethers.formatEther(await App.provider.getBalance(App.account))).toFixed(4)} ETH`;
     if (App.isConfigured("StrikeCoin")) {
       $("strkBalance").textContent = `${fmt(await strk.balanceOf(App.account))} STRK`;
+      rate = await strk.tokensPerEth();
+      cbPct = Number(await strk.rewardPercent());
+      const [res, req, circ] = await Promise.all([strk.reserveBalance(), strk.requiredReserve(), strk.circulatingSupply()]);
+      $("rate").textContent = Number(rate).toLocaleString();
+      $("cbPct").textContent = `${cbPct}%`;
+      $("reserve").textContent = `${Number(ethers.formatEther(res)).toFixed(4)} ETH`;
+      $("circ").textContent = `${fmt(circ)} STRK`;
+      $("sReserve").textContent = `${Number(ethers.formatEther(res)).toFixed(4)} ETH`;
+      $("sRequired").textContent = `${Number(ethers.formatEther(req)).toFixed(4)} ETH`;
+      updateQuote();
     }
     if (App.isConfigured("ElitePass")) {
       const id = await pass.passOf(App.account);
@@ -72,15 +84,19 @@
 
   async function loadFeed() {
     if (!App.isConfigured("StrikeCoin")) return;
-    const [fees, prizes] = await Promise.all([
-      App.events(strk, "MatchFeePaid", CONFIG.deployBlock.StrikeCoin),
-      App.events(strk, "PrizePaid", CONFIG.deployBlock.StrikeCoin)
-    ]);
+    const [fees, prizes, rewards, buys, sells] = await Promise.all(
+      ["MatchFeePaid", "PrizePaid", "RewardEarned", "TokensBought", "TokensSold"].map(n => App.events(strk, n, CONFIG.deployBlock.StrikeCoin)));
     const rows = [
       ...fees.map(l => ({ block: l.blockNumber, hash: l.transactionHash,
         text: `Booking ${l.args.bookingRef.replaceAll("|", " ")}`, who: l.args.team, amt: l.args.amount, kind: "Fee" })),
       ...prizes.map(l => ({ block: l.blockNumber, hash: l.transactionHash,
-        text: `Prize · ${l.args.tournament}`, who: l.args.winner, amt: l.args.amount, kind: "Prize" }))
+        text: `Prize · ${l.args.tournament}`, who: l.args.winner, amt: l.args.amount, kind: "Prize" })),
+      ...rewards.map(l => ({ block: l.blockNumber, hash: l.transactionHash,
+        text: `Cashback reward`, who: l.args.team, amt: l.args.amount, kind: "Reward" })),
+      ...buys.map(l => ({ block: l.blockNumber, hash: l.transactionHash,
+        text: `Bought with ${Number(ethers.formatEther(l.args.ethIn)).toFixed(4)} ETH`, who: l.args.buyer, amt: l.args.strkOut, kind: "Buy" })),
+      ...sells.map(l => ({ block: l.blockNumber, hash: l.transactionHash,
+        text: `Sold for ${Number(ethers.formatEther(l.args.ethOut)).toFixed(4)} ETH`, who: l.args.seller, amt: l.args.strkIn, kind: "Sell" }))
     ].sort((a, b) => b.block - a.block).slice(0, 25);
 
     $("feed").innerHTML = rows.length ? rows.map(r => `
@@ -138,6 +154,43 @@
 
   $("revokeBtn").onclick = async () => {
     const r = await App.send("Revoke Elite Pass", () => pass.revoke(BigInt($("revokeId").value || 0)));
+    if (r) refresh();
+  };
+
+  // ---------- STRK exchange ----------
+  function updateQuote() {
+    const v = Number($("xAmt").value || 0);
+    if (xMode === "buy") $("xOut").textContent = (v * Number(rate)).toLocaleString(undefined, { maximumFractionDigits: 2 });
+    else $("xOut").textContent = (v / Number(rate)).toFixed(6);
+  }
+  document.querySelectorAll("[data-x]").forEach(b => (b.onclick = () => {
+    xMode = b.dataset.x;
+    document.querySelectorAll("[data-x]").forEach(x => x.classList.toggle("on", x === b));
+    $("xLabel").textContent = xMode === "buy" ? "You pay (SepoliaETH)" : "You sell (STRK)";
+    $("xUnit").textContent = xMode === "buy" ? "STRK" : "SepoliaETH";
+    $("xBtn").textContent = xMode === "buy" ? "Buy STRK" : "Sell STRK";
+    $("xAmt").step = xMode === "buy" ? "0.001" : "1";
+    $("xAmt").placeholder = xMode === "buy" ? "0.01" : "100";
+    updateQuote();
+  }));
+  $("xAmt").addEventListener("input", updateQuote);
+  $("xBtn").onclick = async () => {
+    if (!App.account) return App.log("Connect MetaMask first.", "error");
+    const v = $("xAmt").value.trim();
+    if (!v || Number(v) <= 0) return App.log("Enter an amount.", "error");
+    const r = xMode === "buy"
+      ? await App.send("Buy STRK", () => strk.buyTokens({ value: ethers.parseEther(v) }))
+      : await App.send("Sell STRK", () => strk.sellTokens(ethers.parseUnits(v, decimals)));
+    if (r) { $("xAmt").value = ""; refresh(); }
+  };
+  $("fundBtn").onclick = async () => {
+    const v = $("fundAmt").value.trim();
+    if (!v) return App.log("Enter an amount of SepoliaETH.", "error");
+    const r = await App.send("Fund reserve", () => strk.fundReserve({ value: ethers.parseEther(v) }));
+    if (r) refresh();
+  };
+  $("withdrawBtn").onclick = async () => {
+    const r = await App.send("Withdraw excess ETH", () => strk.withdrawExcess());
     if (r) refresh();
   };
 

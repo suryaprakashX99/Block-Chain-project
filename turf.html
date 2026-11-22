@@ -41,9 +41,24 @@
         <h2>Balance &amp; membership</h2>
         <p class="sub">Read directly from the two contracts.</p>
         <div class="stat"><span>StrikeCoin balance</span><b id="strkBalance">-</b></div>
+        <div class="stat"><span>SepoliaETH balance</span><b id="ethBalance">-</b></div>
         <div class="stat"><span>Elite Pass</span><b id="passStatus">-</b></div>
         <div class="stat"><span>Season</span><b id="passSeason">-</b></div>
         <div class="stat"><span>Booking discount</span><b id="passDiscount">-</b></div>
+      </div>
+
+      <!-- STRK exchange -->
+      <div class="card">
+        <span class="tag erc20">ERC-20 · buyTokens / sellTokens</span>
+        <h2>Get StrikeCoin</h2>
+        <p class="sub">Swap SepoliaETH for STRK instantly - or cash STRK back out. Every booking also pays you <b id="cbPct">5%</b> back in STRK.</p>
+        <div class="xchg-rate">1 SepoliaETH = <span id="rate">10,000</span> STRK</div>
+        <div class="xchg-tabs"><button type="button" class="on" data-x="buy">Buy STRK</button><button type="button" data-x="sell">Sell STRK</button></div>
+        <label for="xAmt" id="xLabel">You pay (SepoliaETH)</label>
+        <input id="xAmt" type="number" min="0" step="0.001" placeholder="0.01">
+        <div class="xchg-out">You receive: <b id="xOut">0</b> <span id="xUnit">STRK</span></div>
+        <div class="actions"><button id="xBtn">Buy STRK</button></div>
+        <div class="mini-stats"><div>Reserve held by contract<b id="reserve">-</b></div><div>STRK with customers<b id="circ">-</b></div></div>
       </div>
 
       <!-- Booking -->
@@ -67,7 +82,7 @@
           <select id="bookHour"></select>
         </div>
         <div class="actions">
-          <span class="price">Price: <b id="price">-</b> <span id="priceNote"></span></span>
+          <span class="price">Price: <b id="price">-</b> <span id="priceNote"></span><span class="cashback" id="cashback"></span></span>
         </div>
         <div class="actions">
           <button id="payBtn">Pay with STRK</button>
@@ -85,6 +100,53 @@
 
     <section class="ride" id="ride" aria-hidden="true"></section>
 
+    <!-- Half-time XOXO -->
+    <section class="xoxo" id="xoxo">
+      <div class="section-title" style="margin-top:0">
+        <h2>Half-time XOXO</h2>
+        <p>Football vs cricket ball. Beat the club bot on Rookie or Pro - Legend never loses. Or pass the phone and play a mate.</p>
+      </div>
+      <div class="xoxo-grid">
+        <div class="xo-side">
+          <div class="xo-score" id="xoP1"><svg class="icon" viewBox="0 0 100 100"><use href="#xo-football"/></svg><div><b id="xoP1Name">You</b><span class="muted">Football</span></div><em id="xoS1">0</em></div>
+          <div class="xo-score" id="xoDraw" style="opacity:.7"><div><b>Draws</b></div><em id="xoSD">0</em></div>
+        </div>
+        <div>
+          <div class="xo-board"><div class="xo-pitch" id="xoBoard"></div><canvas class="xo-confetti" id="xoConfetti"></canvas></div>
+          <div class="xo-banner" id="xoBanner">Your kick-off</div>
+          <div class="xo-controls">
+            <button type="button" data-mode="ai" class="on">vs Club bot</button><button type="button" data-mode="pvp">2 players</button>
+            <span style="width:10px"></span>
+            <button type="button" data-level="rookie">Rookie</button><button type="button" data-level="pro" class="on">Pro</button><button type="button" data-level="legend">Legend</button>
+            <span style="width:10px"></span>
+            <button type="button" id="xoSound">🔊 Sound</button><button type="button" class="primary" id="xoNew">New game</button>
+          </div>
+        </div>
+        <div class="xo-side">
+          <div class="xo-score ai" id="xoP2"><svg class="icon" viewBox="0 0 100 100"><use href="#xo-cricket"/></svg><div><b id="xoP2Name">Club bot</b><span class="muted">Cricket ball</span></div><em id="xoS2">0</em></div>
+          <div class="xo-score" style="opacity:.7"><div><b>Streak</b></div><em id="xoStreak">0</em></div>
+        </div>
+      </div>
+      <svg width="0" height="0" style="position:absolute">
+        <defs>
+          <radialGradient id="xoBallShade" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#b9c6d6"/></radialGradient>
+          <radialGradient id="xoRedShade" cx="35%" cy="30%" r="70%"><stop offset="0" stop-color="#ff5a6e"/><stop offset="1" stop-color="#8a0c22"/></radialGradient>
+          <symbol id="xo-football" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="46" fill="url(#xoBallShade)" stroke="#0b0d14" stroke-width="2"/>
+            <polygon points="50,30 69,44 62,66 38,66 31,44" fill="#0b0d14"/>
+            <polygon points="50,4 62,12 58,24 42,24 38,12" fill="#0b0d14"/><polygon points="92,40 96,56 86,64 78,54 82,40" fill="#0b0d14"/>
+            <polygon points="8,40 18,40 22,54 14,64 4,56" fill="#0b0d14"/><polygon points="28,90 38,82 46,90 40,97 30,96" fill="#0b0d14"/><polygon points="72,90 70,96 60,97 54,90 62,82" fill="#0b0d14"/>
+            <path d="M50 24V30M69 44L80 40M62 66L68 80M38 66L32 80M31 44L20 40" stroke="#0b0d14" stroke-width="2"/>
+          </symbol>
+          <symbol id="xo-cricket" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="46" fill="url(#xoRedShade)"/>
+            <path d="M22 16 Q50 50 22 84 M78 16 Q50 50 78 84" fill="none" stroke="#fff4e0" stroke-width="3" stroke-dasharray="5 4"/>
+            <ellipse cx="36" cy="30" rx="12" ry="7" fill="#fff" opacity=".25"/>
+          </symbol>
+        </defs>
+      </svg>
+    </section>
+
     <!-- Staff only -->
     <section class="staff-zone" id="staffZone" hidden>
       <h3><span class="tag staff">Club treasury only</span> Staff tools</h3>
@@ -96,6 +158,16 @@
           <label for="sellTo">Team wallet address</label><input id="sellTo" placeholder="0x...">
           <label for="sellAmt">Amount (STRK)</label><input id="sellAmt" type="number" min="1" placeholder="500">
           <div class="actions"><button id="sellBtn">Send STRK</button></div>
+        </div>
+
+        <div class="card">
+          <span class="tag erc20">ERC-20 · fundReserve / withdrawExcess</span>
+          <h2>Exchange reserve</h2>
+          <p class="sub">SepoliaETH held to buy back customers' STRK. The club can only withdraw ETH that isn't backing customer coins.</p>
+          <div class="stat"><span>Reserve</span><b id="sReserve">-</b></div>
+          <div class="stat"><span>Required to back customers</span><b id="sRequired">-</b></div>
+          <label for="fundAmt">Top up (SepoliaETH)</label><input id="fundAmt" type="number" min="0" step="0.001" placeholder="0.05">
+          <div class="actions"><button id="fundBtn">Fund reserve</button><button id="withdrawBtn" class="secondary">Withdraw excess</button></div>
         </div>
 
         <div class="card">
@@ -146,5 +218,6 @@
   <script src="fx.js"></script>
   <script type="module" src="scene-turf.js"></script>
   <script src="turf.js"></script>
+  <script src="xoxo.js"></script>
 </body>
 </html>

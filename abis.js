@@ -36,6 +36,19 @@ window.ABIS = {
    "anonymous": false,
    "inputs": [
     {
+     "indexed": false,
+     "internalType": "uint256",
+     "name": "ethOut",
+     "type": "uint256"
+    }
+   ],
+   "name": "ExcessWithdrawn",
+   "type": "event"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
      "indexed": true,
      "internalType": "address",
      "name": "team",
@@ -80,6 +93,94 @@ window.ABIS = {
     }
    ],
    "name": "PrizePaid",
+   "type": "event"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": false,
+     "internalType": "uint256",
+     "name": "ethIn",
+     "type": "uint256"
+    }
+   ],
+   "name": "ReserveFunded",
+   "type": "event"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": true,
+     "internalType": "address",
+     "name": "team",
+     "type": "address"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint256",
+     "name": "amount",
+     "type": "uint256"
+    },
+    {
+     "indexed": false,
+     "internalType": "string",
+     "name": "bookingRef",
+     "type": "string"
+    }
+   ],
+   "name": "RewardEarned",
+   "type": "event"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": true,
+     "internalType": "address",
+     "name": "buyer",
+     "type": "address"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint256",
+     "name": "ethIn",
+     "type": "uint256"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint256",
+     "name": "strkOut",
+     "type": "uint256"
+    }
+   ],
+   "name": "TokensBought",
+   "type": "event"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": true,
+     "internalType": "address",
+     "name": "seller",
+     "type": "address"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint256",
+     "name": "strkIn",
+     "type": "uint256"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint256",
+     "name": "ethOut",
+     "type": "uint256"
+    }
+   ],
+   "name": "TokensSold",
    "type": "event"
   },
   {
@@ -189,6 +290,32 @@ window.ABIS = {
   },
   {
    "inputs": [],
+   "name": "buyTokens",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "strkOut",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "payable",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "circulatingSupply",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
    "name": "decimals",
    "outputs": [
     {
@@ -198,6 +325,13 @@ window.ABIS = {
     }
    ],
    "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "fundReserve",
+   "outputs": [],
+   "stateMutability": "payable",
    "type": "function"
   },
   {
@@ -287,6 +421,77 @@ window.ABIS = {
   },
   {
    "inputs": [],
+   "name": "requiredReserve",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "reserveBalance",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "rewardPercent",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint256",
+     "name": "strkIn",
+     "type": "uint256"
+    }
+   ],
+   "name": "sellTokens",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "ethOut",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint256",
+     "name": "pct",
+     "type": "uint256"
+    }
+   ],
+   "name": "setRewardPercent",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [],
    "name": "symbol",
    "outputs": [
     {
@@ -306,6 +511,19 @@ window.ABIS = {
      "internalType": "address",
      "name": "",
      "type": "address"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "tokensPerEth",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
     }
    ],
    "stateMutability": "view",
@@ -376,6 +594,17 @@ window.ABIS = {
    ],
    "stateMutability": "nonpayable",
    "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "withdrawExcess",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "stateMutability": "payable",
+   "type": "receive"
   }
  ],
  "ElitePass": [
@@ -1851,6 +2080,278 @@ window.ABIS = {
     }
    ],
    "stateMutability": "view",
+   "type": "function"
+  }
+ ],
+ "GarageChallenge": [
+  {
+   "inputs": [
+    {
+     "internalType": "address",
+     "name": "apexPointsAddress",
+     "type": "address"
+    }
+   ],
+   "stateMutability": "nonpayable",
+   "type": "constructor"
+  },
+  {
+   "anonymous": false,
+   "inputs": [
+    {
+     "indexed": true,
+     "internalType": "address",
+     "name": "player",
+     "type": "address"
+    },
+    {
+     "indexed": true,
+     "internalType": "uint8",
+     "name": "level",
+     "type": "uint8"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint32",
+     "name": "seconds_",
+     "type": "uint32"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint16",
+     "name": "mistakes",
+     "type": "uint16"
+    },
+    {
+     "indexed": false,
+     "internalType": "uint256",
+     "name": "reward",
+     "type": "uint256"
+    }
+   ],
+   "name": "GameCompleted",
+   "type": "event"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint8",
+     "name": "level",
+     "type": "uint8"
+    },
+    {
+     "internalType": "uint32",
+     "name": "secondsTaken",
+     "type": "uint32"
+    },
+    {
+     "internalType": "uint16",
+     "name": "mistakes",
+     "type": "uint16"
+    }
+   ],
+   "name": "claim",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "cooldown",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "address",
+     "name": "",
+     "type": "address"
+    },
+    {
+     "internalType": "uint8",
+     "name": "",
+     "type": "uint8"
+    }
+   ],
+   "name": "lastClaim",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "maxMistakes",
+   "outputs": [
+    {
+     "internalType": "uint16",
+     "name": "",
+     "type": "uint16"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "minSeconds",
+   "outputs": [
+    {
+     "internalType": "uint32",
+     "name": "",
+     "type": "uint32"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "owner",
+   "outputs": [
+    {
+     "internalType": "address",
+     "name": "",
+     "type": "address"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "points",
+   "outputs": [
+    {
+     "internalType": "contract IERC20",
+     "name": "",
+     "type": "address"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [],
+   "name": "poolBalance",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint8",
+     "name": "",
+     "type": "uint8"
+    }
+   ],
+   "name": "rewardFor",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint8",
+     "name": "level",
+     "type": "uint8"
+    },
+    {
+     "internalType": "uint256",
+     "name": "amount",
+     "type": "uint256"
+    }
+   ],
+   "name": "setReward",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint256",
+     "name": "_cooldown",
+     "type": "uint256"
+    },
+    {
+     "internalType": "uint32",
+     "name": "_minSeconds",
+     "type": "uint32"
+    },
+    {
+     "internalType": "uint16",
+     "name": "_maxMistakes",
+     "type": "uint16"
+    }
+   ],
+   "name": "setRules",
+   "outputs": [],
+   "stateMutability": "nonpayable",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "address",
+     "name": "player",
+     "type": "address"
+    },
+    {
+     "internalType": "uint8",
+     "name": "level",
+     "type": "uint8"
+    }
+   ],
+   "name": "waitTime",
+   "outputs": [
+    {
+     "internalType": "uint256",
+     "name": "",
+     "type": "uint256"
+    }
+   ],
+   "stateMutability": "view",
+   "type": "function"
+  },
+  {
+   "inputs": [
+    {
+     "internalType": "uint256",
+     "name": "amount",
+     "type": "uint256"
+    }
+   ],
+   "name": "withdrawPool",
+   "outputs": [],
+   "stateMutability": "nonpayable",
    "type": "function"
   }
  ]

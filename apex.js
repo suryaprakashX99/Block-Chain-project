@@ -153,5 +153,7 @@
     }
   };
 
-  App.configNotice(["ApexPoints", "ApexGear"]);
+  document.addEventListener("apex-refresh", () => { if (App.account) refresh(); });
+
+  App.configNotice(["ApexPoints", "ApexGear", "GarageChallenge"]);
 })();

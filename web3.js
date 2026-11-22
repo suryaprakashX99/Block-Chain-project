@@ -98,6 +98,7 @@ const App = {
         }
       }
       this.log(`Connected ${this.short(this.account)} on ${CONFIG.network.name}`, "ok");
+      setTimeout(() => document.dispatchEvent(new Event("wallet-connected")), 0);
       return true;
     } catch (e) {
       this.log(this.reason(e), "error");
@@ -200,3 +201,6 @@ const App = {
     }
   }
 };
+
+// Expose for ES modules (workshop.js) - top-level const is not a window property.
+window.App = App;
