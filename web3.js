@@ -15,18 +15,44 @@ const App = {
     return String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   },
 
-  // ---------- activity log (bottom-right panel) ----------
+  // ---------- notifications (bottom-right) ----------
+  // Returns a handle so one transaction can update a single toast in place.
   log(message, type = "info", link) {
     const box = this.$("log");
-    if (!box) return;
+    if (!box) return { update() {}, close() {} };
+    if (!box.dataset.ready) {
+      box.dataset.ready = "1";
+      box.innerHTML = `<button class="log-clear" type="button">Clear all</button>`;
+      box.querySelector(".log-clear").onclick = () => { box.querySelectorAll(".log-item").forEach(n => n.remove()); box.classList.remove("show"); };
+    }
     const item = document.createElement("div");
-    item.className = `log-item ${type}`;
-    item.innerHTML = `<span>${this.escape(message)}</span>` +
-      (link ? ` <a href="${link}" target="_blank" rel="noopener">View on Etherscan</a>` : "");
-    box.prepend(item);
+    let timer = null;
+    const handle = {
+      update: (msg, t = type, l) => {
+        item.className = `log-item ${t}`;
+        item.innerHTML = `<div class="log-body"><span>${this.escape(msg)}</span>` +
+          (l ? ` <a href="${l}" target="_blank" rel="noopener">View on Etherscan ↗</a>` : "") +
+          `</div><button class="log-x" type="button" aria-label="Dismiss">×</button>`;
+        item.querySelector(".log-x").onclick = handle.close;
+        clearTimeout(timer);
+        if (t === "ok" || t === "info") timer = setTimeout(handle.close, 7000);   // success fades by itself
+        return handle;
+      },
+      close: () => {
+        clearTimeout(timer);
+        item.classList.add("leaving");
+        setTimeout(() => {
+          item.remove();
+          if (!box.querySelector(".log-item")) box.classList.remove("show");
+        }, 250);
+      }
+    };
+    handle.update(message, type, link);
+    box.querySelector(".log-clear").after(item);
     box.classList.add("show");
-    while (box.children.length > 5) box.lastChild.remove();          // keep the panel short
-    if (type === "ok" || type === "info") setTimeout(() => item.remove(), 15000);
+    const items = box.querySelectorAll(".log-item");
+    for (let i = 4; i < items.length; i++) items[i].remove();      // keep at most 4
+    return handle;
   },
 
   // ---------- NFT metadata ----------
@@ -59,13 +85,53 @@ const App = {
       window.ethereum.on?.("chainChanged", () => location.reload());
 
       const btn = this.$("connectBtn");
-      if (btn) { btn.textContent = this.short(this.account); btn.classList.add("connected"); }
+      if (btn) {
+        btn.textContent = this.short(this.account);
+        btn.title = "Connected account";
+        btn.classList.add("connected");
+        if (!this.$("switchBtn")) {
+          const sw = document.createElement("button");
+          sw.id = "switchBtn"; sw.type = "button"; sw.className = "ghost";
+          sw.textContent = "Switch account";
+          sw.onclick = () => this.switchAccount();
+          btn.after(sw);
+        }
+      }
       this.log(`Connected ${this.short(this.account)} on ${CONFIG.network.name}`, "ok");
       return true;
     } catch (e) {
       this.log(this.reason(e), "error");
       return false;
     }
+  },
+
+  // Opens MetaMask's account picker so a different account can connect to this site.
+  async switchAccount() {
+    try {
+      await window.ethereum.request({ method: "wallet_requestPermissions", params: [{ eth_accounts: {} }] });
+      location.reload();
+    } catch (e) {
+      this.log(this.reason(e), "error");
+    }
+  },
+
+  // Staff accounts see the staff tools; they can also flip to the customer view.
+  setupRole(isStaff, staffLabel, customerLabel) {
+    const chip = this.$("roleChip"), zone = this.$("staffZone");
+    const apply = staffView => {
+      zone.hidden = !staffView;
+      chip.textContent = staffView ? staffLabel : customerLabel;
+      if (toggle) toggle.textContent = staffView ? "View as customer" : "View as staff";
+    };
+    let toggle = null;
+    if (isStaff && !this.$("viewToggle")) {
+      toggle = document.createElement("button");
+      toggle.id = "viewToggle"; toggle.type = "button"; toggle.className = "ghost";
+      let staffView = true;
+      toggle.onclick = () => { staffView = !staffView; apply(staffView); };
+      this.$("switchBtn")?.after(toggle);
+    }
+    apply(isStaff);
   },
 
   async ensureNetwork() {
@@ -91,17 +157,17 @@ const App = {
     return new ethers.Contract(CONFIG.contracts[name], ABIS[name], this.signer);
   },
 
-  // Sends a transaction and reports each stage in the activity log.
+  // Sends a transaction and reports each stage in ONE toast that updates in place.
   async send(label, makeTx) {
+    const toast = this.log(`${label}: confirm in MetaMask...`, "pending");
     try {
-      this.log(`${label}: confirm in MetaMask...`, "pending");
       const tx = await makeTx();
-      this.log(`${label}: submitted, waiting for a block...`, "pending", this.txLink(tx.hash));
+      toast.update(`${label}: submitted, waiting for a block...`, "pending", this.txLink(tx.hash));
       const receipt = await tx.wait();
-      this.log(`${label}: confirmed in block ${receipt.blockNumber}`, "ok", this.txLink(tx.hash));
+      toast.update(`${label}: confirmed in block ${receipt.blockNumber}`, "ok", this.txLink(tx.hash));
       return receipt;
     } catch (e) {
-      this.log(`${label} failed: ${this.reason(e)}`, "error");
+      toast.update(`${label} failed: ${this.reason(e)}`, "error");
       return null;
     }
   },

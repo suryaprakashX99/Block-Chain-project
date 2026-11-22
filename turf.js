@@ -154,8 +154,7 @@
         pass = App.contract("ElitePass");
         isClub = isClub || (await pass.owner()).toLowerCase() === App.account.toLowerCase();
       }
-      $("roleChip").textContent = isClub ? "Signed in as club treasury" : "Signed in as team / member";
-      $("staffZone").hidden = !isClub;
+      App.setupRole(isClub, "Signed in as club treasury", "Signed in as team / member");
       await refresh();
     } catch (e) {
       App.log(App.reason(e), "error");

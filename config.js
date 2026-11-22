@@ -37,10 +37,12 @@ window.CONFIG = {
   turf: {
     pitches: ["Pitch A - 5-a-side football", "Pitch B - Cricket nets", "Pitch C - Full-size rugby"],
     priceHourly: 40,   // STRK per hour
-    priceFullDay: 250  // STRK per day
+    priceFullDay: 250, // STRK per day
+    heroVideo: ""      // optional: e.g. "turf-hero.mp4" (a royalty-free clip you upload next to the pages)
   },
   apex: {
     pointsPerEuro: 1,     // points rewarded per EUR 1 spent on a service
-    euroPer100Points: 5   // value of 100 points when redeemed
+    euroPer100Points: 5,  // value of 100 points when redeemed
+    heroVideo: ""         // optional: e.g. "apex-hero.mp4"
   }
 };

@@ -25,6 +25,7 @@
 
   <section class="hero">
     <div class="scene" aria-hidden="true"><div class="stars"></div><div class="sun"></div><div class="palm-l"></div><div class="palm-r"></div><div class="floor"></div></div>
+    <div class="stage3d" id="stage3d" aria-label="Interactive 3D model"></div>
     <h1>Earn points. Prove it's genuine.</h1>
     <p>Apex Loyalty Points reward each completed job. Every premium helmet and jacket comes with an authenticity certificate that anyone can check, and that passes to the next owner when you sell.</p>
     <div class="chips"><span class="chip accent" id="roleChip">Not connected</span><span class="chip">APXP · ERC-20</span><span class="chip">APEXG · ERC-721</span></div>
@@ -91,6 +92,8 @@
       </div>
     </div>
 
+    <section class="ride" id="ride" aria-hidden="true"></section>
+
     <!-- Staff only -->
     <section class="staff-zone" id="staffZone" hidden>
       <h3><span class="tag staff">Garage staff only</span> Counter tools</h3>
@@ -143,6 +146,8 @@
   <script src="abis.js"></script>
   <script src="config.js"></script>
   <script src="web3.js"></script>
+  <script src="fx.js"></script>
+  <script type="module" src="scene-apex.js"></script>
   <script src="apex.js"></script>
 </body>
 </html>

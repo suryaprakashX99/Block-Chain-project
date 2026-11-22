@@ -25,6 +25,7 @@
 
   <section class="hero">
     <div class="scene" aria-hidden="true"><div class="stars"></div><div class="sun"></div><div class="palm-l"></div><div class="palm-r"></div><div class="floor"></div></div>
+    <div class="stage3d" id="stage3d" aria-label="Interactive 3D model"></div>
     <h1>Book pitches and pay fees with StrikeCoin</h1>
     <p>Pay for bookings in STRK, get your Elite Pass discount applied automatically, and see every fee and prize payment on the public ledger.</p>
     <div class="chips"><span class="chip accent" id="roleChip">Not connected</span><span class="chip">STRK · ERC-20</span><span class="chip">EPASS · ERC-721</span></div>
@@ -81,6 +82,8 @@
         <ul class="feed" id="feed"><li class="empty">Connect your wallet to load activity.</li></ul>
       </div>
     </div>
+
+    <section class="ride" id="ride" aria-hidden="true"></section>
 
     <!-- Staff only -->
     <section class="staff-zone" id="staffZone" hidden>
@@ -140,6 +143,8 @@
   <script src="abis.js"></script>
   <script src="config.js"></script>
   <script src="web3.js"></script>
+  <script src="fx.js"></script>
+  <script type="module" src="scene-turf.js"></script>
   <script src="turf.js"></script>
 </body>
 </html>

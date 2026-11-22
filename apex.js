@@ -146,8 +146,7 @@
         gear = App.contract("ApexGear");
         isGarage = isGarage || (await gear.owner()).toLowerCase() === App.account.toLowerCase();
       }
-      $("roleChip").textContent = isGarage ? "Signed in as garage staff" : "Signed in as customer";
-      $("staffZone").hidden = !isGarage;
+      App.setupRole(isGarage, "Signed in as garage staff", "Signed in as customer");
       await refresh();
     } catch (e) {
       App.log(App.reason(e), "error");
