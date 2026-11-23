@@ -177,16 +177,22 @@ const App = {
     }
   },
 
-  // Event history, newest first. Falls back to a recent window if the RPC limits the range.
+  // Event history, newest first. Public RPCs often refuse one big eth_getLogs over many blocks,
+  // so if the full range fails we scan from the deploy block in 5,000-block chunks.
   async events(contract, eventName, deployBlock) {
     const filter = contract.filters[eventName]();
     // Ask the node for the latest block directly (ethers caches it for a few seconds).
     const latest = Number(await this.provider.send("eth_blockNumber", []));
+    const start = deployBlock || Math.max(0, latest - 50000);
     try {
-      return (await contract.queryFilter(filter, deployBlock || 0, latest)).reverse();
-    } catch (e) {
-      return (await contract.queryFilter(filter, Math.max(0, latest - 9000), latest)).reverse();
+      return (await contract.queryFilter(filter, start, latest)).reverse();
+    } catch (e) { /* range too large for this RPC - fall through to chunks */ }
+    const out = [], STEP = 5000;
+    for (let from = start; from <= latest; from += STEP + 1) {
+      const to = Math.min(latest, from + STEP);
+      out.push(...(await contract.queryFilter(filter, from, to)));
     }
+    return out.reverse();
   },
 
   // Block timestamp (cached) -> Date, used by the dashboards.

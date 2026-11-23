@@ -25,11 +25,11 @@ window.CONFIG = {
   },
 
   deployBlock: {
-    StrikeCoin: 0,
-    ElitePass:  0,
-    ApexPoints: 0,
-    ApexGear:   0,
-    GarageChallenge: 0
+    StrikeCoin: 12185500,
+    ElitePass:  12180000,
+    ApexPoints: 12180000,
+    ApexGear:   12180000,
+    GarageChallenge: 12185500
   },
 
   // Folder holding the NFT images (used when the site builds token metadata automatically).
